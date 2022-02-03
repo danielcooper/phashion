@@ -8,8 +8,11 @@ $includes = " -I#{HERE}/include"
 $libraries = " -L#{HERE}/lib -L/usr/local/lib"
 $LIBPATH = ["#{HERE}/lib"]
 $CFLAGS = "#{$includes} #{$libraries} #{$CFLAGS}"
+$CFLAGS = "#{$CFLAGS} -fdeclspec" if RUBY_PLATFORM =~ /arm64-darwin/
 $LDFLAGS = "#{$libraries} #{$LDFLAGS}"
-$CXXFLAGS = ' -pthread'  
+$LDFLAGS = "#{$LDFLAGS} -L/opt/homebrew/opt/libjpeg/lib -L/opt/homebrew/opt/libpng/lib" if RUBY_PLATFORM =~ /arm64-darwin/
+$CXXFLAGS = ' -pthread'
+$CXXFLAGS = "#{$CXXFLAGS} -I/opt/homebrew/include/libpng16 -I/opt/homebrew/include" if RUBY_PLATFORM =~ /arm64-darwin/
 
 Dir.chdir(HERE) do
   if File.exist?("lib")
@@ -43,6 +46,6 @@ Dir.chdir(HERE) do
   $LIBS = " -lpthread -lpHash_gem -lstdc++ -ljpeg -lpng"
 end
 
-have_header 'sqlite3ext.h'
+have_header 'sqlite3ext.h' unless RUBY_PLATFORM =~ /arm64-darwin/
 
 create_makefile 'phashion_ext'
